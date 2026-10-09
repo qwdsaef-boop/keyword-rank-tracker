@@ -17,15 +17,13 @@ module.exports = async function handler(req, res) {
   const keyword = String(body.keyword || "").trim();
   const rawDomain = String(body.domain || "").trim();
   const country = String(body.country || "in").trim().toLowerCase();
-  const location = String(body.location || "").trim();
+  // Accepted from the UI for display/diagnostics. Serper does not guarantee device-specific SERPs.
+  const device = String(body.device || "desktop").trim().toLowerCase();
 
   if (!keyword || !rawDomain) {
-    return res.status(400).json({
-      error: "Enter both a keyword and a website domain."
-    });
+    return res.status(400).json({ error: "Enter both a keyword and a website domain." });
   }
-
-  if (keyword.length > 200 || rawDomain.length > 253 || location.length > 100) {
+  if (keyword.length > 200 || rawDomain.length > 253) {
     return res.status(400).json({ error: "One or more fields are too long." });
   }
 
@@ -33,18 +31,20 @@ module.exports = async function handler(req, res) {
   if (!allowedCountries.has(country)) {
     return res.status(400).json({ error: "Unsupported country selection." });
   }
+  if (!["desktop", "mobile"].includes(device)) {
+    return res.status(400).json({ error: "Unsupported device selection." });
+  }
 
   const domain = normalizeDomain(rawDomain);
   if (!domain || !domain.includes(".") || domain.includes(" ")) {
-    return res.status(400).json({
-      error: "Enter a valid domain, such as example.com."
-    });
+    return res.status(400).json({ error: "Enter a valid domain, such as example.com." });
   }
 
   try {
     let checkedResults = 0;
 
-    // Search up to 10 pages (100 organic results maximum).
+    // Request one page at a time and stop immediately when the domain is found.
+    // This uses Serper's page parameter; verify account/API support if the provider changes its pagination behaviour.
     for (let page = 1; page <= 10; page++) {
       const payload = {
         q: keyword,
@@ -53,8 +53,6 @@ module.exports = async function handler(req, res) {
         num: 10,
         page
       };
-
-      if (location) payload.location = location;
 
       const apiResponse = await fetch("https://google.serper.dev/search", {
         method: "POST",
@@ -66,7 +64,6 @@ module.exports = async function handler(req, res) {
       });
 
       const rawText = await apiResponse.text();
-
       if (!apiResponse.ok) {
         console.error("Serper API error", apiResponse.status, rawText.slice(0, 300));
         return res.status(502).json({
@@ -78,27 +75,28 @@ module.exports = async function handler(req, res) {
       try {
         data = JSON.parse(rawText);
       } catch {
-        return res.status(502).json({
-          error: "The search provider returned an invalid response."
-        });
+        return res.status(502).json({ error: "The search provider returned an invalid response." });
       }
 
       const organic = Array.isArray(data.organic) ? data.organic : [];
-      checkedResults += organic.length;
+      if (organic.length === 0) break;
 
       for (let i = 0; i < organic.length; i++) {
-        const url = String(organic[i].link || "");
+        const item = organic[i];
+        const url = String(item.link || "");
         if (!url) continue;
 
         const resultDomain = normalizeDomain(url);
+        const position = (page - 1) * 10 + (Number(item.position) || i + 1);
+        checkedResults = Math.max(checkedResults, position);
 
         if (resultDomain === domain || resultDomain.endsWith("." + domain)) {
-          const position = (page - 1) * 10 + i + 1;
-
           return res.status(200).json({
             keyword,
             domain,
-            locationLabel: location || country.toUpperCase(),
+            country,
+            device,
+            deviceSpecific: false,
             found: true,
             position,
             url,
@@ -107,14 +105,16 @@ module.exports = async function handler(req, res) {
         }
       }
 
-      // No more results available.
+      checkedResults = (page - 1) * 10 + organic.length;
       if (organic.length < 10) break;
     }
 
     return res.status(200).json({
       keyword,
       domain,
-      locationLabel: location || country.toUpperCase(),
+      country,
+      device,
+      deviceSpecific: false,
       found: false,
       position: null,
       url: null,
@@ -122,9 +122,7 @@ module.exports = async function handler(req, res) {
     });
   } catch (error) {
     console.error("Rank check failed", error);
-    return res.status(502).json({
-      error: "Unable to reach the search provider. Please try again."
-    });
+    return res.status(502).json({ error: "Unable to reach the search provider. Please try again." });
   }
 };
 
