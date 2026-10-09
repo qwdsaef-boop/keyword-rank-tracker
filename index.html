@@ -36,8 +36,6 @@
     .rank small { display:block; font-size:12px; color:var(--muted); letter-spacing:0; font-weight:600; }
     .pill { display:inline-block; background:#dcfce7; color:#166534; border-radius:999px; padding:6px 10px; font-size:12px; font-weight:750; }
     .url { display:block; overflow-wrap:anywhere; color:#1d4ed8; margin-top:14px; }
-    .results-list { margin:16px 0 0; padding-left:20px; }
-    .results-list li { margin:8px 0; overflow-wrap:anywhere; }
     .fineprint { color:var(--muted); font-size:12px; line-height:1.6; margin-top:18px; }
     .features { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-top:22px; }
     .feature { background:#fff; border:1px solid var(--line); border-radius:14px; padding:17px; }
@@ -58,7 +56,7 @@
 <main>
   <section class="hero">
     <h1>Check your Google rankings</h1>
-    <p>Enter your website and a keyword to see whether your domain appears in the first 10 organic search results for your selected location.</p>
+    <p>Enter your website and a keyword to check whether your domain appears in the first 100 organic search results for your selected country.</p>
   </section>
 
   <section class="panel">
@@ -84,12 +82,15 @@
         </select>
       </div>
       <div class="field">
-        <label for="location">City or search location (optional)</label>
-        <input id="location" name="location" placeholder="e.g. Kochi, Kerala, India" maxlength="100">
+        <label for="device">Device</label>
+        <select id="device" name="device">
+          <option value="desktop" selected>Desktop</option>
+          <option value="mobile">Mobile</option>
+        </select>
       </div>
       <div class="field wide">
         <button id="submitBtn" type="submit">Check ranking</button>
-        <div class="hint">This beta checks the first 10 organic results. One search API request is made per check.</div>
+        <div class="hint">Checks up to 100 organic results and stops when your domain is found. Device selection is experimental; Serper may return the same results for both options.</div>
       </div>
     </form>
     <div id="status" role="status" aria-live="polite"></div>
@@ -97,13 +98,13 @@
   </section>
 
   <section class="features">
-    <div class="feature"><b>Simple rank check</b><span>Check a single keyword without setting up a project.</span></div>
-    <div class="feature"><b>Location-aware</b><span>Choose a country and optionally enter a city or search location.</span></div>
+    <div class="feature"><b>Top-100 rank check</b><span>Searches in batches and stops when your domain is found.</span></div>
+    <div class="feature"><b>Country targeting</b><span>Select the country used for the search.</span></div>
     <div class="feature"><b>Ranking URL</b><span>See which URL from your domain appears in the returned results.</span></div>
   </section>
-  <p class="fineprint">RankCheck is an independent prototype and is not affiliated with Google. Results are supplied by a third-party search API and may differ from searches made directly in Google. Only the first 10 organic results are checked in this initial version; a result not found here may rank lower down. Do not enter sensitive information.</p>
+  <p class="fineprint">RankCheck is an independent prototype and is not affiliated with Google. Results are supplied by a third-party search API and may differ from searches made directly in Google. Device is shown as a selection, but the current Serper integration does not guarantee device-specific results. A result not found in the top 100 may rank lower down or vary by location.</p>
 </main>
-<footer>Free beta · Search results may vary by location, time, and search settings.</footer>
+<footer>Free beta · Search results may vary by country, time, and search settings.</footer>
 
 <script>
   const form = document.getElementById('rankForm');
@@ -123,7 +124,7 @@
       domain: document.getElementById('domain').value.trim(),
       keyword: document.getElementById('keyword').value.trim(),
       country: document.getElementById('country').value,
-      location: document.getElementById('location').value.trim()
+      device: document.getElementById('device').value
     };
 
     try {
@@ -138,25 +139,32 @@
       statusEl.textContent = '';
       resultEl.style.display = 'block';
 
+      const deviceLabel = payload.device === 'mobile' ? 'Mobile' : 'Desktop';
+      const deviceNote = 'Selected device: ' + deviceLabel + '. Device-specific ranking is not guaranteed by the current Serper integration.';
+
       if (data.found) {
         resultEl.innerHTML = `
           <div class="result-card">
             <div class="result-top">
-              <div><div class="rank">#${data.position}<small>Organic position in returned results</small></div></div>
+              <div><div class="rank">#${Number(data.position)}<small>Organic position in returned results</small></div></div>
               <span class="pill">Domain found</span>
             </div>
             <p><b>Keyword:</b> ${escapeHtml(data.keyword)}</p>
             <p><b>Domain:</b> ${escapeHtml(data.domain)}</p>
+            <p><b>Checked:</b> ${Number(data.checkedResults)} organic results</p>
+            <p><b>Device selected:</b> ${escapeHtml(deviceLabel)}</p>
             <a class="url" href="${safeUrl(data.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(data.url)}</a>
-            <p class="hint">Checked ${data.checkedResults} organic results for ${escapeHtml(data.locationLabel)}.</p>
+            <p class="hint">${escapeHtml(deviceNote)}</p>
           </div>`;
       } else {
         resultEl.innerHTML = `
           <div class="result-card">
-            <div class="result-top"><b>Not found in the first 10 organic results</b></div>
+            <div class="result-top"><b>Not found in the top 100 organic results</b></div>
             <p>We did not find <b>${escapeHtml(data.domain)}</b> in the results returned for this keyword.</p>
             <p><b>Keyword:</b> ${escapeHtml(data.keyword)}</p>
-            <p class="hint">This does not mean your website is unindexed. It may rank below the first 10 results or the results may vary by location.</p>
+            <p><b>Checked:</b> ${Number(data.checkedResults)} organic results</p>
+            <p><b>Device selected:</b> ${escapeHtml(deviceLabel)}</p>
+            <p class="hint">This does not mean your website is unindexed. It may rank below the top 100. ${escapeHtml(deviceNote)}</p>
           </div>`;
       }
     } catch (error) {
