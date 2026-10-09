@@ -3,129 +3,409 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Check where your website appears in Google search results for a keyword.">
-  <title>RankCheck — Free Keyword Rank Checker</title>
+  <meta name="description" content="Check where your website appears in Google search results for a keyword. Free top-100 rank checker with country targeting.">
+  <title>RankCheck: Free Google Keyword Rank Checker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    :root { color-scheme: light; --ink:#172033; --muted:#64748b; --line:#dbe3ef; --blue:#2563eb; --bg:#f5f7fb; }
-    * { box-sizing:border-box; }
-    body { margin:0; font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; background:var(--bg); color:var(--ink); }
-    header { background:#111827; color:#fff; padding:20px 24px; }
-    .nav, main, footer { max-width:900px; margin:0 auto; }
-    .nav { display:flex; align-items:center; gap:12px; font-weight:750; font-size:20px; }
-    .logo { display:grid; place-items:center; width:38px;height:38px;border-radius:11px;background:#38bdf8;color:#0f172a;font-size:22px; }
-    .tag { margin-left:auto; font-size:12px; border:1px solid #475569; border-radius:999px; padding:6px 10px; color:#bae6fd; }
-    main { padding:44px 20px 32px; }
-    .hero { text-align:center; margin-bottom:28px; }
-    h1 { font-size:clamp(30px,5vw,44px); line-height:1.1; margin:0 0 12px; letter-spacing:-1.2px; }
-    .hero p { color:var(--muted); margin:0 auto; max-width:620px; line-height:1.6; }
-    .panel { background:#fff; border:1px solid var(--line); border-radius:20px; padding:26px; box-shadow:0 12px 35px #0f172a0a; }
-    form { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
-    .field { display:flex; flex-direction:column; gap:7px; }
-    .wide { grid-column:1/-1; }
-    label { font-size:13px; font-weight:700; }
-    input, select { width:100%; border:1px solid #cbd5e1; border-radius:10px; padding:13px 12px; font:inherit; background:#fff; color:var(--ink); }
-    input:focus,select:focus { outline:3px solid #bfdbfe; border-color:var(--blue); }
-    button { border:0; border-radius:11px; background:var(--blue); color:white; padding:14px 18px; font:inherit; font-weight:750; cursor:pointer; }
-    button:disabled { opacity:.6; cursor:wait; }
-    .hint { color:var(--muted); font-size:12px; line-height:1.5; }
-    #status { margin-top:18px; color:var(--muted); font-size:14px; }
-    #result { display:none; margin-top:22px; }
-    .result-card { background:#f8fafc; border:1px solid var(--line); border-radius:14px; padding:20px; }
-    .result-top { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; flex-wrap:wrap; }
-    .rank { font-size:42px; font-weight:800; letter-spacing:-1px; }
-    .rank small { display:block; font-size:12px; color:var(--muted); letter-spacing:0; font-weight:600; }
-    .pill { display:inline-block; background:#dcfce7; color:#166534; border-radius:999px; padding:6px 10px; font-size:12px; font-weight:750; }
-    .url { display:block; overflow-wrap:anywhere; color:#1d4ed8; margin-top:14px; }
-    .fineprint { color:var(--muted); font-size:12px; line-height:1.6; margin-top:18px; }
-    .features { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-top:22px; }
-    .feature { background:#fff; border:1px solid var(--line); border-radius:14px; padding:17px; }
-    .feature b { display:block; margin-bottom:5px; }
-    .feature span { color:var(--muted); font-size:13px; line-height:1.5; }
-    footer { padding:8px 20px 28px; color:var(--muted); font-size:12px; text-align:center; }
-    @media(max-width:620px) { form,.features { grid-template-columns:1fr; } .wide { grid-column:auto; } .panel { padding:18px; } main { padding-top:30px; } }
+    :root {
+      color-scheme: light;
+      --paper: #F3F5F9;
+      --surface: #FFFFFF;
+      --ink: #0E1B33;
+      --muted: #5B6678;
+      --line: #D6DCE6;
+      --cell: #E6EAF1;
+      --cobalt: #1E4BD8;
+      --cobalt-deep: #1638A8;
+      --cobalt-soft: #E3EAFE;
+      --found: #0B7F55;
+      --found-soft: #DCF2E8;
+      --warn: #9A4A06;
+      --warn-soft: #FDF0E1;
+      --error: #B42318;
+      --error-soft: #FEECEB;
+      --font: "Schibsted Grotesk", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body { margin: 0; font-family: var(--font); background: var(--paper); color: var(--ink); line-height: 1.5; }
+    a { color: var(--cobalt); }
+    .wrap { max-width: 1040px; margin: 0 auto; padding: 0 20px; }
+
+    /* Header */
+    .site-header { background: var(--surface); border-bottom: 1px solid var(--line); }
+    .site-header .wrap { display: flex; align-items: center; gap: 10px; height: 64px; }
+    .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 19px; letter-spacing: -0.3px; color: var(--ink); text-decoration: none; }
+    .brand svg { display: block; }
+    .beta { margin-left: auto; font-size: 13px; font-weight: 600; color: var(--cobalt-deep); background: var(--cobalt-soft); border-radius: 6px; padding: 4px 9px; }
+
+    /* Hero + form */
+    .top { display: grid; grid-template-columns: 1fr 1.1fr; gap: 48px; align-items: start; padding: 56px 0 28px; }
+    h1 { font-size: clamp(34px, 5.2vw, 54px); line-height: 1.02; letter-spacing: -1.8px; font-weight: 800; margin: 0 0 18px; }
+    .lede { color: var(--muted); font-size: 17px; max-width: 34ch; margin: 0 0 26px; }
+    .steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; max-width: 38ch; }
+    .steps li { display: grid; grid-template-columns: 26px 1fr; gap: 12px; font-size: 15px; }
+    .steps b { display: block; font-weight: 700; }
+    .steps span { color: var(--muted); font-size: 14px; }
+    .steps .n { width: 26px; height: 26px; border-radius: 50%; border: 1.5px solid var(--ink); display: grid; place-items: center; font-size: 13px; font-weight: 700; margin-top: 1px; }
+
+    .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 26px; box-shadow: 0 1px 0 #0E1B330a, 0 18px 40px -24px #0E1B3340; }
+    form { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+    .wide { grid-column: 1 / -1; }
+    label { font-size: 14px; font-weight: 700; }
+    input, select {
+      width: 100%; border: 1.5px solid #C5CDDA; border-radius: 10px; padding: 12px 13px;
+      font: inherit; font-size: 16px; background: #fff; color: var(--ink);
+      transition: border-color .15s, box-shadow .15s;
+    }
+    select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%235B6678' stroke-width='1.8' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 13px center; padding-right: 36px; }
+    input::placeholder { color: #98A2B3; }
+    input:hover, select:hover { border-color: #9AA6B8; }
+    input:focus, select:focus { outline: none; border-color: var(--cobalt); box-shadow: 0 0 0 4px var(--cobalt-soft); }
+    input[aria-invalid="true"] { border-color: var(--error); }
+    .field-note { font-size: 13px; color: var(--muted); min-height: 0; }
+    .field-note.err { color: var(--error); }
+
+    .seg { display: grid; grid-template-columns: 1fr 1fr; border: 1.5px solid #C5CDDA; border-radius: 10px; padding: 3px; gap: 3px; }
+    .seg input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+    .seg label { font-weight: 600; font-size: 15px; text-align: center; padding: 8px 6px; border-radius: 7px; cursor: pointer; color: var(--muted); }
+    .seg input:checked + label { background: var(--ink); color: #fff; }
+    .seg input:focus-visible + label { box-shadow: 0 0 0 3px var(--cobalt-soft), 0 0 0 1.5px var(--cobalt); }
+
+    button { font: inherit; cursor: pointer; }
+    #submitBtn {
+      border: 0; border-radius: 10px; background: var(--cobalt); color: #fff;
+      padding: 15px 18px; font-size: 16px; font-weight: 700; width: 100%;
+      display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+      transition: background .15s;
+    }
+    #submitBtn:hover { background: var(--cobalt-deep); }
+    #submitBtn:focus-visible { outline: 3px solid var(--cobalt-soft); outline-offset: 2px; }
+    #submitBtn:disabled { opacity: .75; cursor: progress; }
+    .spinner { width: 16px; height: 16px; border: 2.5px solid #ffffff55; border-top-color: #fff; border-radius: 50%; animation: spin .8s linear infinite; display: none; }
+    #submitBtn.loading .spinner { display: inline-block; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .hint { color: var(--muted); font-size: 13px; line-height: 1.5; margin-top: 8px; }
+
+    #status:empty { display: none; }
+    #status { margin-top: 16px; font-size: 14px; color: var(--muted); }
+    #status.error { color: var(--error); background: var(--error-soft); border-radius: 10px; padding: 12px 14px; font-weight: 500; }
+
+    /* Recent checks */
+    .recent { margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--line); }
+    .recent[hidden] { display: none; }
+    .recent-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; }
+    .recent-head h2 { font-size: 14px; margin: 0; }
+    .linkish { background: none; border: 0; padding: 0; color: var(--muted); font-size: 13px; text-decoration: underline; }
+    .recent-list { display: flex; flex-wrap: wrap; gap: 8px; list-style: none; margin: 0; padding: 0; }
+    .recent-list button {
+      border: 1px solid var(--line); background: var(--paper); border-radius: 8px; padding: 7px 10px;
+      font-size: 13px; color: var(--ink); text-align: left; display: flex; gap: 8px; align-items: center; max-width: 100%;
+    }
+    .recent-list button:hover { border-color: #9AA6B8; background: #fff; }
+    .recent-list .kw { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 22ch; }
+    .badge { font-weight: 700; font-size: 12px; border-radius: 5px; padding: 1px 6px; font-variant-numeric: tabular-nums; }
+    .badge.hit { background: var(--found-soft); color: var(--found); }
+    .badge.miss { background: var(--cell); color: var(--muted); }
+
+    /* Result */
+    #result { display: none; margin: 8px 0 24px; scroll-margin-top: 20px; }
+    #result:focus { outline: none; }
+    .result-card { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 28px; }
+    .result-grid { display: grid; grid-template-columns: auto 1fr; gap: 32px; align-items: start; }
+    .rank { font-size: clamp(64px, 10vw, 104px); font-weight: 800; letter-spacing: -4px; line-height: .9; font-variant-numeric: tabular-nums; color: var(--ink); }
+    .rank.miss { font-size: clamp(40px, 6vw, 56px); letter-spacing: -1.5px; color: var(--muted); }
+    .rank-sub { font-size: 15px; font-weight: 600; margin-top: 10px; }
+    .verdict { display: inline-block; font-size: 13px; font-weight: 700; border-radius: 6px; padding: 4px 9px; margin-bottom: 12px; }
+    .verdict.p1 { background: var(--found-soft); color: var(--found); }
+    .verdict.p2 { background: var(--cobalt-soft); color: var(--cobalt-deep); }
+    .verdict.low { background: var(--warn-soft); color: var(--warn); }
+    .verdict.none { background: var(--cell); color: var(--muted); }
+    .result-url { display: block; font-size: 15px; font-weight: 600; overflow-wrap: anywhere; margin-bottom: 16px; }
+    dl.meta { display: grid; grid-template-columns: max-content 1fr; gap: 6px 16px; margin: 0; font-size: 14px; }
+    dl.meta dt { color: var(--muted); }
+    dl.meta dd { margin: 0; overflow-wrap: anywhere; font-weight: 500; }
+
+    /* The 100-result map */
+    .serp-map { margin-top: 26px; }
+    .serp-map-head { display: flex; justify-content: space-between; gap: 12px; font-size: 13px; color: var(--muted); margin-bottom: 10px; flex-wrap: wrap; }
+    .legend { display: flex; gap: 14px; flex-wrap: wrap; }
+    .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; }
+    .pages { display: grid; grid-template-columns: repeat(10, 1fr); gap: 8px; }
+    .page { display: flex; flex-direction: column; gap: 5px; }
+    .page-label { font-size: 11px; font-weight: 600; color: var(--muted); text-align: center; }
+    .page.current .page-label { color: var(--ink); }
+    .cells { display: grid; grid-template-columns: repeat(5, 1fr); gap: 2px; }
+    .cell { aspect-ratio: 1; border-radius: 2px; background: repeating-linear-gradient(135deg, #EEF1F6 0 2px, #E1E6EE 2px 4px); }
+    .cell.checked { background: var(--cell); }
+    .cell.hit { background: var(--found); box-shadow: 0 0 0 2px var(--found-soft); position: relative; z-index: 1; }
+    .scanning .cell { background: var(--cell); animation: scan 1.6s ease-in-out infinite; animation-delay: calc(var(--i) * 14ms); }
+    @keyframes scan { 0%, 70%, 100% { background: var(--cell); } 20% { background: var(--cobalt); } }
+
+    .result-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 22px; }
+    .btn-quiet { border: 1.5px solid var(--line); background: #fff; color: var(--ink); border-radius: 9px; padding: 9px 14px; font-size: 14px; font-weight: 600; }
+    .btn-quiet:hover { border-color: #9AA6B8; }
+    .btn-quiet:focus-visible, .linkish:focus-visible, .recent-list button:focus-visible { outline: 3px solid var(--cobalt-soft); outline-offset: 2px; }
+    .result-note { color: var(--muted); font-size: 13px; margin: 16px 0 0; }
+
+    .scan-card { display: flex; flex-direction: column; gap: 6px; }
+    .scan-title { font-weight: 700; font-size: 17px; }
+    .scan-sub { color: var(--muted); font-size: 14px; font-variant-numeric: tabular-nums; }
+
+    .fineprint { color: var(--muted); font-size: 13px; line-height: 1.6; max-width: 75ch; margin: 28px 0 0; }
+    .site-footer { padding: 28px 0 36px; color: var(--muted); font-size: 13px; }
+
+    @media (max-width: 860px) {
+      .top { grid-template-columns: 1fr; gap: 28px; padding-top: 36px; }
+      .lede, .steps { max-width: 60ch; }
+      .steps { grid-template-columns: repeat(3, 1fr); }
+      .steps li { grid-template-columns: 1fr; gap: 8px; }
+    }
+    @media (max-width: 620px) {
+      form { grid-template-columns: 1fr; }
+      .wide { grid-column: auto; }
+      .panel, .result-card { padding: 18px; }
+      .steps { grid-template-columns: 1fr; }
+      .steps li { grid-template-columns: 26px 1fr; gap: 12px; }
+      .result-grid { grid-template-columns: 1fr; gap: 18px; }
+      .pages { grid-template-columns: repeat(5, 1fr); row-gap: 12px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; }
+      .scanning .cell { background: var(--cell); }
+    }
   </style>
 </head>
 <body>
-<header>
-  <div class="nav">
-    <div class="logo">↗</div>
-    <span>RankCheck</span>
-    <span class="tag">FREE BETA</span>
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="/" aria-label="RankCheck home">
+      <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true">
+        <rect width="30" height="30" rx="8" fill="#0E1B33"/>
+        <rect x="7" y="17" width="4" height="6" rx="1" fill="#5B7BEA"/>
+        <rect x="13" y="12" width="4" height="11" rx="1" fill="#8FA6F2"/>
+        <rect x="19" y="7" width="4" height="16" rx="1" fill="#fff"/>
+      </svg>
+      RankCheck
+    </a>
+    <span class="beta">Free beta</span>
   </div>
 </header>
-<main>
-  <section class="hero">
-    <h1>Check your Google rankings</h1>
-    <p>Enter your website and a keyword to check whether your domain appears in the first 100 organic search results for your selected country.</p>
+
+<main class="wrap">
+  <section class="top">
+    <div class="intro">
+      <h1>Where does your site rank on Google?</h1>
+      <p class="lede">Enter a domain and a keyword. RankCheck scans the top 100 organic results in your chosen country and shows your position and ranking page.</p>
+      <ol class="steps">
+        <li><span class="n" aria-hidden="true">1</span><div><b>Enter domain and keyword</b><span>Paste a full URL if you like. We trim it to the domain.</span></div></li>
+        <li><span class="n" aria-hidden="true">2</span><div><b>We scan up to 100 results</b><span>The scan stops as soon as your domain shows up.</span></div></li>
+        <li><span class="n" aria-hidden="true">3</span><div><b>See your position</b><span>Get the rank, the Google page it sits on, and the URL that ranks.</span></div></li>
+      </ol>
+    </div>
+
+    <section class="panel" aria-label="Rank check form">
+      <form id="rankForm" novalidate>
+        <div class="field wide">
+          <label for="domain">Website domain</label>
+          <input id="domain" name="domain" placeholder="example.com" required maxlength="253"
+                 autocomplete="url" inputmode="url" spellcheck="false" autocapitalize="off" aria-describedby="domainNote">
+          <div id="domainNote" class="field-note"></div>
+        </div>
+        <div class="field wide">
+          <label for="keyword">Keyword</label>
+          <input id="keyword" name="keyword" placeholder="best hotels in kerala" required maxlength="200"
+                 autocomplete="off" aria-describedby="keywordNote">
+          <div id="keywordNote" class="field-note"></div>
+        </div>
+        <div class="field">
+          <label for="country">Country</label>
+          <select id="country" name="country">
+            <option value="in" selected>India</option>
+            <option value="ae">United Arab Emirates</option>
+            <option value="sa">Saudi Arabia</option>
+            <option value="qa">Qatar</option>
+            <option value="kw">Kuwait</option>
+            <option value="om">Oman</option>
+            <option value="bh">Bahrain</option>
+            <option value="us">United States</option>
+            <option value="gb">United Kingdom</option>
+            <option value="au">Australia</option>
+            <option value="ca">Canada</option>
+            <option value="sg">Singapore</option>
+          </select>
+        </div>
+        <div class="field">
+          <!-- Hidden select keeps the original #device contract; the toggle below drives it -->
+          <label id="deviceLabel">Device</label>
+          <select id="device" name="device" hidden>
+            <option value="desktop" selected>Desktop</option>
+            <option value="mobile">Mobile</option>
+          </select>
+          <div class="seg" role="radiogroup" aria-labelledby="deviceLabel">
+            <input type="radio" name="deviceToggle" id="devDesktop" value="desktop" checked>
+            <label for="devDesktop">Desktop</label>
+            <input type="radio" name="deviceToggle" id="devMobile" value="mobile">
+            <label for="devMobile">Mobile</label>
+          </div>
+        </div>
+        <div class="field wide">
+          <button id="submitBtn" type="submit"><span class="spinner" aria-hidden="true"></span><span class="btn-text">Check ranking</span></button>
+          <div class="hint">Mobile results are experimental. The search API may return the same results for both devices.</div>
+        </div>
+      </form>
+      <div id="status" role="status" aria-live="polite"></div>
+
+      <div class="recent" id="recent" hidden>
+        <div class="recent-head">
+          <h2>Recent checks</h2>
+          <button type="button" class="linkish" id="clearRecent">Clear</button>
+        </div>
+        <ul class="recent-list" id="recentList"></ul>
+      </div>
+    </section>
   </section>
 
-  <section class="panel">
-    <form id="rankForm">
-      <div class="field">
-        <label for="domain">Website domain</label>
-        <input id="domain" name="domain" placeholder="example.com" required maxlength="253" autocomplete="url">
-      </div>
-      <div class="field">
-        <label for="keyword">Keyword</label>
-        <input id="keyword" name="keyword" placeholder="best hotels in kerala" required maxlength="200">
-      </div>
-      <div class="field">
-        <label for="country">Country</label>
-        <select id="country" name="country">
-          <option value="in" selected>India</option>
-          <option value="us">United States</option>
-          <option value="gb">United Kingdom</option>
-          <option value="ae">United Arab Emirates</option>
-          <option value="au">Australia</option>
-          <option value="ca">Canada</option>
-          <option value="sg">Singapore</option>
-        </select>
-      </div>
-      <div class="field">
-        <label for="device">Device</label>
-        <select id="device" name="device">
-          <option value="desktop" selected>Desktop</option>
-          <option value="mobile">Mobile</option>
-        </select>
-      </div>
-      <div class="field wide">
-        <button id="submitBtn" type="submit">Check ranking</button>
-        <div class="hint">Checks up to 100 organic results and stops when your domain is found. Device selection is experimental; Serper may return the same results for both options.</div>
-      </div>
-    </form>
-    <div id="status" role="status" aria-live="polite"></div>
-    <section id="result" aria-live="polite"></section>
-  </section>
+  <section id="result" aria-live="polite" tabindex="-1"></section>
 
-  <section class="features">
-    <div class="feature"><b>Top-100 rank check</b><span>Searches in batches and stops when your domain is found.</span></div>
-    <div class="feature"><b>Country targeting</b><span>Select the country used for the search.</span></div>
-    <div class="feature"><b>Ranking URL</b><span>See which URL from your domain appears in the returned results.</span></div>
-  </section>
-  <p class="fineprint">RankCheck is an independent prototype and is not affiliated with Google. Results are supplied by a third-party search API and may differ from searches made directly in Google. Device is shown as a selection, but the current Serper integration does not guarantee device-specific results. A result not found in the top 100 may rank lower down or vary by location.</p>
+  <p class="fineprint">RankCheck is an independent prototype and is not affiliated with Google. Results come from a third-party search API and can differ from what you see when you search Google yourself. Device-specific results are not guaranteed. If your domain is not in the top 100, it may rank lower or vary by location.</p>
 </main>
-<footer>Free beta · Search results may vary by country, time, and search settings.</footer>
+
+<footer class="site-footer">
+  <div class="wrap">Free beta. Search results vary by country, time, and search settings.</div>
+</footer>
 
 <script>
   const form = document.getElementById('rankForm');
   const submitBtn = document.getElementById('submitBtn');
+  const btnText = submitBtn.querySelector('.btn-text');
   const statusEl = document.getElementById('status');
   const resultEl = document.getElementById('result');
+  const domainEl = document.getElementById('domain');
+  const keywordEl = document.getElementById('keyword');
+  const countryEl = document.getElementById('country');
+  const deviceEl = document.getElementById('device');
+  const recentWrap = document.getElementById('recent');
+  const recentList = document.getElementById('recentList');
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+  const STORE_PREFS = 'rankcheck:prefs';
+  const STORE_RECENT = 'rankcheck:recent';
+  let scanTimer = null;
+  let lastSummary = '';
+
+  /* ---------- Storage helpers (never break the page if storage is blocked) ---------- */
+  function load(key, fallback) {
+    try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; } catch { return fallback; }
+  }
+  function save(key, value) {
+    try { localStorage.setItem(key, JSON.stringify(value)); } catch {}
+  }
+
+  /* ---------- Device toggle mirrors the original #device select ---------- */
+  document.querySelectorAll('input[name="deviceToggle"]').forEach(radio => {
+    radio.addEventListener('change', () => { deviceEl.value = radio.value; });
+  });
+  function setDevice(value) {
+    deviceEl.value = value === 'mobile' ? 'mobile' : 'desktop';
+    document.getElementById(deviceEl.value === 'mobile' ? 'devMobile' : 'devDesktop').checked = true;
+  }
+
+  /* ---------- Restore last-used settings ---------- */
+  (function restorePrefs() {
+    const prefs = load(STORE_PREFS, {});
+    if (prefs.domain) domainEl.value = prefs.domain;
+    if (prefs.country && countryEl.querySelector(`option[value="${prefs.country}"]`)) countryEl.value = prefs.country;
+    if (prefs.device) setDevice(prefs.device);
+    renderRecent();
+  })();
+
+  /* ---------- Input cleanup ---------- */
+  function cleanDomain(raw) {
+    let v = String(raw).trim().toLowerCase();
+    v = v.replace(/^[a-z]+:\/\//, '');   // drop protocol
+    v = v.split(/[/?#]/)[0];             // drop path, query, hash
+    v = v.replace(/:\d+$/, '');          // drop port
+    return v;
+  }
+  function looksLikeDomain(v) {
+    return /^([a-z0-9-]+\.)+[a-z]{2,}$/i.test(v) || /^xn--/i.test(v);
+  }
+  function setFieldError(input, noteId, message) {
+    const note = document.getElementById(noteId);
+    input.setAttribute('aria-invalid', message ? 'true' : 'false');
+    note.textContent = message || '';
+    note.classList.toggle('err', Boolean(message));
+  }
+  domainEl.addEventListener('blur', () => {
+    const cleaned = cleanDomain(domainEl.value);
+    if (cleaned && cleaned !== domainEl.value.trim()) {
+      domainEl.value = cleaned;
+      setFieldError(domainEl, 'domainNote', '');
+      document.getElementById('domainNote').textContent = 'Trimmed to the domain name.';
+    }
+  });
+  domainEl.addEventListener('input', () => setFieldError(domainEl, 'domainNote', ''));
+  keywordEl.addEventListener('input', () => setFieldError(keywordEl, 'keywordNote', ''));
+
+  function validate(payload) {
+    let ok = true;
+    if (!payload.domain) { setFieldError(domainEl, 'domainNote', 'Enter a domain, for example example.com.'); ok = false; }
+    else if (!looksLikeDomain(payload.domain)) { setFieldError(domainEl, 'domainNote', 'That does not look like a domain. Try something like example.com.'); ok = false; }
+    if (!payload.keyword) { setFieldError(keywordEl, 'keywordNote', 'Enter the keyword you want to check.'); ok = false; }
+    if (!ok) (domainEl.getAttribute('aria-invalid') === 'true' ? domainEl : keywordEl).focus();
+    return ok;
+  }
+
+  /* ---------- Loading state ---------- */
+  function setLoading(on) {
+    submitBtn.disabled = on;
+    submitBtn.classList.toggle('loading', on);
+    submitBtn.setAttribute('aria-busy', on ? 'true' : 'false');
+    btnText.textContent = on ? 'Checking…' : 'Check ranking';
+  }
+  function showScanning(payload) {
+    const started = Date.now();
+    resultEl.style.display = 'block';
+    resultEl.innerHTML = `
+      <div class="result-card">
+        <div class="scan-card">
+          <div class="scan-title">Scanning Google results for “${escapeHtml(payload.keyword)}”</div>
+          <div class="scan-sub" id="scanSub">Looking for ${escapeHtml(payload.domain)} in ${escapeHtml(countryName(payload.country))}. 0s</div>
+        </div>
+        <div class="serp-map">${buildMap(0, 0, true)}</div>
+      </div>`;
+    const sub = document.getElementById('scanSub');
+    clearInterval(scanTimer);
+    scanTimer = setInterval(() => {
+      const s = Math.round((Date.now() - started) / 1000);
+      sub.textContent = `Looking for ${payload.domain} in ${countryName(payload.country)}. ${s}s`;
+    }, 1000);
+  }
+  function stopScanning() { clearInterval(scanTimer); scanTimer = null; }
+
+  /* ---------- Main submit (same endpoint and payload as before) ---------- */
   form.addEventListener('submit', async (event) => {
     event.preventDefault();
-    resultEl.style.display = 'none';
-    resultEl.innerHTML = '';
-    statusEl.textContent = 'Checking search results…';
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Checking…';
+    statusEl.textContent = '';
+    statusEl.classList.remove('error');
 
     const payload = {
-      domain: document.getElementById('domain').value.trim(),
-      keyword: document.getElementById('keyword').value.trim(),
-      country: document.getElementById('country').value,
-      device: document.getElementById('device').value
+      domain: cleanDomain(domainEl.value),
+      keyword: keywordEl.value.trim().replace(/\s+/g, ' '),
+      country: countryEl.value,
+      device: deviceEl.value
     };
+    if (!validate(payload)) return;
+    domainEl.value = payload.domain;
+    keywordEl.value = payload.keyword;
+    save(STORE_PREFS, { domain: payload.domain, country: payload.country, device: payload.device });
+
+    setLoading(true);
+    showScanning(payload);
 
     try {
       const response = await fetch('/api/rank', {
@@ -133,48 +413,207 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || 'Could not check rankings.');
 
-      statusEl.textContent = '';
-      resultEl.style.display = 'block';
+      // Read as text first so an HTML error page does not crash JSON parsing
+      const raw = await response.text();
+      let data = {};
+      try { data = raw ? JSON.parse(raw) : {}; } catch { data = {}; }
+      if (!response.ok) throw new Error(data.error || friendlyHttpError(response.status));
 
-      const deviceLabel = payload.device === 'mobile' ? 'Mobile' : 'Desktop';
-      const deviceNote = 'Selected device: ' + deviceLabel + '. Device-specific ranking is not guaranteed by the current Serper integration.';
-
-      if (data.found) {
-        resultEl.innerHTML = `
-          <div class="result-card">
-            <div class="result-top">
-              <div><div class="rank">#${Number(data.position)}<small>Organic position in returned results</small></div></div>
-              <span class="pill">Domain found</span>
-            </div>
-            <p><b>Keyword:</b> ${escapeHtml(data.keyword)}</p>
-            <p><b>Domain:</b> ${escapeHtml(data.domain)}</p>
-            <p><b>Checked:</b> ${Number(data.checkedResults)} organic results</p>
-            <p><b>Device selected:</b> ${escapeHtml(deviceLabel)}</p>
-            <a class="url" href="${safeUrl(data.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(data.url)}</a>
-            <p class="hint">${escapeHtml(deviceNote)}</p>
-          </div>`;
-      } else {
-        resultEl.innerHTML = `
-          <div class="result-card">
-            <div class="result-top"><b>Not found in the top 100 organic results</b></div>
-            <p>We did not find <b>${escapeHtml(data.domain)}</b> in the results returned for this keyword.</p>
-            <p><b>Keyword:</b> ${escapeHtml(data.keyword)}</p>
-            <p><b>Checked:</b> ${Number(data.checkedResults)} organic results</p>
-            <p><b>Device selected:</b> ${escapeHtml(deviceLabel)}</p>
-            <p class="hint">This does not mean your website is unindexed. It may rank below the top 100. ${escapeHtml(deviceNote)}</p>
-          </div>`;
-      }
+      stopScanning();
+      renderResult(data, payload);
+      addRecent(data, payload);
     } catch (error) {
-      statusEl.textContent = error.message || 'Something went wrong. Please try again.';
+      stopScanning();
+      resultEl.style.display = 'none';
+      resultEl.innerHTML = '';
+      statusEl.classList.add('error');
+      statusEl.textContent = error instanceof TypeError
+        ? 'Could not reach the server. Check your connection and try again.'
+        : (error.message || 'Something went wrong. Try again.');
     } finally {
-      submitBtn.disabled = false;
-      submitBtn.textContent = 'Check ranking';
+      setLoading(false);
     }
   });
 
+  function friendlyHttpError(status) {
+    if (status === 429) return 'Too many checks in a short time. Wait a minute, then try again.';
+    if (status === 400) return 'The request was not accepted. Check the domain and keyword, then try again.';
+    if (status >= 500) return 'The rank service did not respond. Try again in a moment.';
+    return 'Could not check rankings. Try again.';
+  }
+
+  /* ---------- Rendering ---------- */
+  function countryName(code) {
+    const opt = countryEl.querySelector(`option[value="${code}"]`);
+    return opt ? opt.textContent : String(code).toUpperCase();
+  }
+  function deviceName(d) { return d === 'mobile' ? 'Mobile' : 'Desktop'; }
+
+  function buildMap(position, checked, scanning) {
+    let pages = '';
+    const hitPage = position ? Math.ceil(position / 10) : 0;
+    for (let p = 1; p <= 10; p++) {
+      let cells = '';
+      for (let i = (p - 1) * 10 + 1; i <= p * 10; i++) {
+        let cls = 'cell';
+        if (!scanning && i <= checked) cls += ' checked';
+        if (!scanning && i === position) cls += ' hit';
+        const title = i === position && !scanning ? ` title="Your domain, position ${i}"` : '';
+        cells += `<span class="${cls}" style="--i:${i}"${title}></span>`;
+      }
+      pages += `<div class="page${p === hitPage ? ' current' : ''}"><span class="page-label">Page ${p}</span><div class="cells">${cells}</div></div>`;
+    }
+    const head = scanning ? '' : `
+      <div class="serp-map-head">
+        <span>Top 100 results, grouped by Google page</span>
+        <span class="legend">
+          <span><i style="background:var(--found)"></i>Your domain</span>
+          <span><i style="background:var(--cell)"></i>Checked</span>
+          <span><i style="background:repeating-linear-gradient(135deg,#EEF1F6 0 2px,#E1E6EE 2px 4px)"></i>Not checked</span>
+        </span>
+      </div>`;
+    return `${head}<div class="pages${scanning ? ' scanning' : ''}" role="img" aria-label="${scanning ? 'Scanning results' : (position ? `Your domain is at position ${position} of 100` : 'Your domain was not found in the checked results')}">${pages}</div>`;
+  }
+
+  function verdictFor(position) {
+    if (position <= 3) return { cls: 'p1', text: 'Top 3 on page 1' };
+    if (position <= 10) return { cls: 'p1', text: 'On page 1' };
+    if (position <= 20) return { cls: 'p2', text: 'On page 2, close to page 1' };
+    return { cls: 'low', text: `On page ${Math.ceil(position / 10)}` };
+  }
+
+  function renderResult(data, payload) {
+    const keyword = data.keyword ?? payload.keyword;
+    const domain = data.domain ?? payload.domain;
+    const checked = Number(data.checkedResults) || 0;
+    const device = deviceName(payload.device);
+    const country = countryName(payload.country);
+    resultEl.style.display = 'block';
+
+    if (data.found) {
+      const position = Number(data.position);
+      const page = Math.ceil(position / 10);
+      const onPage = position - (page - 1) * 10;
+      const v = verdictFor(position);
+      lastSummary = `Keyword: ${keyword}\nDomain: ${domain}\nPosition: #${position} (page ${page})\nRanking URL: ${data.url}\nCountry: ${country}\nDevice: ${device}`;
+
+      resultEl.innerHTML = `
+        <div class="result-card">
+          <div class="result-grid">
+            <div>
+              <div class="rank">#${position}</div>
+              <div class="rank-sub">Page ${page}, result ${onPage}</div>
+            </div>
+            <div>
+              <span class="verdict ${v.cls}">${escapeHtml(v.text)}</span>
+              <a class="result-url" href="${safeUrl(data.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(data.url)}</a>
+              <dl class="meta">
+                <dt>Keyword</dt><dd>${escapeHtml(keyword)}</dd>
+                <dt>Domain</dt><dd>${escapeHtml(domain)}</dd>
+                <dt>Country</dt><dd>${escapeHtml(country)}</dd>
+                <dt>Device</dt><dd>${escapeHtml(device)}</dd>
+                <dt>Checked</dt><dd>${checked} organic results</dd>
+              </dl>
+            </div>
+          </div>
+          <div class="serp-map">${buildMap(position, checked, false)}</div>
+          <div class="result-actions">
+            <button type="button" class="btn-quiet" data-action="copy">Copy result</button>
+            <button type="button" class="btn-quiet" data-action="another">Check another keyword</button>
+          </div>
+          ${payload.device === 'mobile' ? '<p class="result-note">Mobile was selected. The current search API does not guarantee mobile-specific rankings.</p>' : ''}
+        </div>`;
+    } else {
+      lastSummary = `Keyword: ${keyword}\nDomain: ${domain}\nPosition: not in top ${checked || 100}\nCountry: ${country}\nDevice: ${device}`;
+      resultEl.innerHTML = `
+        <div class="result-card">
+          <div class="result-grid">
+            <div><div class="rank miss">100+</div><div class="rank-sub">Not in the top ${checked || 100}</div></div>
+            <div>
+              <span class="verdict none">Not found</span>
+              <p style="margin:0 0 14px">${escapeHtml(domain)} did not appear in the results returned for this keyword.</p>
+              <dl class="meta">
+                <dt>Keyword</dt><dd>${escapeHtml(keyword)}</dd>
+                <dt>Country</dt><dd>${escapeHtml(country)}</dd>
+                <dt>Device</dt><dd>${escapeHtml(device)}</dd>
+                <dt>Checked</dt><dd>${checked} organic results</dd>
+              </dl>
+            </div>
+          </div>
+          <div class="serp-map">${buildMap(0, checked, false)}</div>
+          <div class="result-actions">
+            <button type="button" class="btn-quiet" data-action="copy">Copy result</button>
+            <button type="button" class="btn-quiet" data-action="another">Check another keyword</button>
+          </div>
+          <p class="result-note">This does not mean your site is unindexed. It may rank below 100, or rank for a closer variation of this keyword. Try a longer, more specific phrase.</p>
+        </div>`;
+    }
+
+    resultEl.focus({ preventScroll: true });
+    const rect = resultEl.getBoundingClientRect();
+    if (rect.top > window.innerHeight * 0.6 || rect.top < 0) {
+      resultEl.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+    }
+  }
+
+  resultEl.addEventListener('click', async (e) => {
+    const btn = e.target.closest('button[data-action]');
+    if (!btn) return;
+    if (btn.dataset.action === 'copy') {
+      try {
+        await navigator.clipboard.writeText(lastSummary);
+        btn.textContent = 'Copied';
+      } catch {
+        btn.textContent = 'Copy not available';
+      }
+      setTimeout(() => { btn.textContent = 'Copy result'; }, 1800);
+    }
+    if (btn.dataset.action === 'another') {
+      keywordEl.value = '';
+      keywordEl.focus();
+      window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
+    }
+  });
+
+  /* ---------- Recent checks (stored in this browser only) ---------- */
+  function addRecent(data, payload) {
+    const list = load(STORE_RECENT, []).filter(r =>
+      !(r.domain === payload.domain && r.keyword === payload.keyword && r.country === payload.country && r.device === payload.device));
+    list.unshift({
+      domain: payload.domain, keyword: payload.keyword, country: payload.country, device: payload.device,
+      found: Boolean(data.found), position: data.found ? Number(data.position) : null
+    });
+    save(STORE_RECENT, list.slice(0, 8));
+    renderRecent();
+  }
+  function renderRecent() {
+    const list = load(STORE_RECENT, []);
+    recentWrap.hidden = list.length === 0;
+    recentList.innerHTML = list.map((r, idx) => `
+      <li><button type="button" data-idx="${idx}" title="${escapeHtml(r.keyword)} on ${escapeHtml(r.domain)}, ${escapeHtml(countryName(r.country))}, ${escapeHtml(deviceName(r.device))}">
+        <span class="badge ${r.found ? 'hit' : 'miss'}">${r.found ? '#' + Number(r.position) : '100+'}</span>
+        <span class="kw">${escapeHtml(r.keyword)}</span>
+        <span style="color:var(--muted)">${escapeHtml(String(r.country).toUpperCase())}</span>
+      </button></li>`).join('');
+  }
+  recentList.addEventListener('click', (e) => {
+    const btn = e.target.closest('button[data-idx]');
+    if (!btn || submitBtn.disabled) return;
+    const r = load(STORE_RECENT, [])[Number(btn.dataset.idx)];
+    if (!r) return;
+    domainEl.value = r.domain;
+    keywordEl.value = r.keyword;
+    if (countryEl.querySelector(`option[value="${r.country}"]`)) countryEl.value = r.country;
+    setDevice(r.device);
+    form.requestSubmit ? form.requestSubmit() : form.dispatchEvent(new Event('submit', { cancelable: true }));
+  });
+  document.getElementById('clearRecent').addEventListener('click', () => {
+    save(STORE_RECENT, []);
+    renderRecent();
+  });
+
+  /* ---------- Original helpers, unchanged ---------- */
   function escapeHtml(value) {
     return String(value).replace(/[&<>"']/g, ch => ({
       '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'
