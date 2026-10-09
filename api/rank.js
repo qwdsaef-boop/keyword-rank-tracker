@@ -20,11 +20,15 @@ module.exports = async function handler(req, res) {
   const location = String(body.location || "").trim();
 
   if (!keyword || !rawDomain) {
-    return res.status(400).json({ error: "Enter both a keyword and a website domain." });
+    return res.status(400).json({
+      error: "Enter both a keyword and a website domain."
+    });
   }
+
   if (keyword.length > 200 || rawDomain.length > 253 || location.length > 100) {
     return res.status(400).json({ error: "One or more fields are too long." });
   }
+
   const allowedCountries = new Set(["in", "us", "gb", "ae", "au", "ca", "sg"]);
   if (!allowedCountries.has(country)) {
     return res.status(400).json({ error: "Unsupported country selection." });
@@ -32,70 +36,95 @@ module.exports = async function handler(req, res) {
 
   const domain = normalizeDomain(rawDomain);
   if (!domain || !domain.includes(".") || domain.includes(" ")) {
-    return res.status(400).json({ error: "Enter a valid domain, such as example.com." });
+    return res.status(400).json({
+      error: "Enter a valid domain, such as example.com."
+    });
   }
 
-  const payload = {
-    q: keyword,
-    gl: country,
-    hl: country === "in" || country === "sg" || country === "ae" ? "en" : "en",
-    num: 10
-  };
-  if (location) payload.location = location;
-
   try {
-    const apiResponse = await fetch("https://google.serper.dev/search", {
-      method: "POST",
-      headers: {
-        "X-API-KEY": apiKey,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(payload)
-    });
+    let checkedResults = 0;
 
-    const rawText = await apiResponse.text();
-    if (!apiResponse.ok) {
-      console.error("Serper API error", apiResponse.status, rawText.slice(0, 300));
-      return res.status(502).json({
-        error: "The search provider could not complete the request. Please try again later."
+    // Search up to 10 pages (100 organic results maximum).
+    for (let page = 1; page <= 10; page++) {
+      const payload = {
+        q: keyword,
+        gl: country,
+        hl: "en",
+        num: 10,
+        page
+      };
+
+      if (location) payload.location = location;
+
+      const apiResponse = await fetch("https://google.serper.dev/search", {
+        method: "POST",
+        headers: {
+          "X-API-KEY": apiKey,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
       });
-    }
 
-    let data;
-    try {
-      data = JSON.parse(rawText);
-    } catch {
-      return res.status(502).json({ error: "The search provider returned an invalid response." });
-    }
+      const rawText = await apiResponse.text();
 
-    const organic = Array.isArray(data.organic) ? data.organic : [];
-    let match = null;
-
-    for (let i = 0; i < organic.length; i++) {
-      const item = organic[i];
-      const url = String(item.link || "");
-      if (!url) continue;
-
-      const resultDomain = normalizeDomain(url);
-      if (resultDomain === domain || resultDomain.endsWith("." + domain)) {
-        const position = Number(item.position) || (i + 1);
-        match = { position, url };
-        break;
+      if (!apiResponse.ok) {
+        console.error("Serper API error", apiResponse.status, rawText.slice(0, 300));
+        return res.status(502).json({
+          error: "The search provider could not complete the request. Please try again later."
+        });
       }
+
+      let data;
+      try {
+        data = JSON.parse(rawText);
+      } catch {
+        return res.status(502).json({
+          error: "The search provider returned an invalid response."
+        });
+      }
+
+      const organic = Array.isArray(data.organic) ? data.organic : [];
+      checkedResults += organic.length;
+
+      for (let i = 0; i < organic.length; i++) {
+        const url = String(organic[i].link || "");
+        if (!url) continue;
+
+        const resultDomain = normalizeDomain(url);
+
+        if (resultDomain === domain || resultDomain.endsWith("." + domain)) {
+          const position = (page - 1) * 10 + i + 1;
+
+          return res.status(200).json({
+            keyword,
+            domain,
+            locationLabel: location || country.toUpperCase(),
+            found: true,
+            position,
+            url,
+            checkedResults
+          });
+        }
+      }
+
+      // No more results available.
+      if (organic.length < 10) break;
     }
 
     return res.status(200).json({
       keyword,
       domain,
       locationLabel: location || country.toUpperCase(),
-      found: Boolean(match),
-      position: match ? match.position : null,
-      url: match ? match.url : null,
-      checkedResults: organic.length
+      found: false,
+      position: null,
+      url: null,
+      checkedResults
     });
   } catch (error) {
     console.error("Rank check failed", error);
-    return res.status(502).json({ error: "Unable to reach the search provider. Please try again." });
+    return res.status(502).json({
+      error: "Unable to reach the search provider. Please try again."
+    });
   }
 };
 
